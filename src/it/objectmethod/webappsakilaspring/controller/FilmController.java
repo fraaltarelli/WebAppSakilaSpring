@@ -33,7 +33,7 @@ public class FilmController {
 
 	@Autowired
 	IDaoActor daoActor;
-	
+
 
 	@GetMapping("/ricercaFilmPerCategoria")
 	public String filmPerCategoria (@RequestParam("categoriaFilm") Integer category_id, ModelMap model) {
@@ -79,89 +79,53 @@ public class FilmController {
 			@RequestParam("anno") Integer anno, @RequestParam(value="idAttoriDaInserire", required=false) Integer[] attori,
 			@RequestParam("categoria") Integer categoriaId, ModelMap model) {
 		boolean errors=false;
+		double prezzoInDouble=0;
+		String messaggio="inserimento andato a buon fine";
 
 		if(attori==null) {
 			errors = true;
-			model.addAttribute("messaggio", "scegliere almeno un attore");
-			List<Category> allCategories = new ArrayList<Category>();
-			allCategories = daoCategory.allCategories();
-			model.addAttribute("allCategories", allCategories);
-
-			List<Actor> allActors = new ArrayList<Actor>();
-			allActors = daoActor.allActors();
-			model.addAttribute("allActors", allActors);
+			messaggio="scegliere almeno un attore";
 		}
-		if(!errors) {
-			Film filmDaInserire = new Film();
-			if(titolo=="") {
-				errors = true;
-				model.addAttribute("messaggio", "inserisci il titolo");
-				List<Category> allCategories = new ArrayList<Category>();
-				allCategories = daoCategory.allCategories();
-				model.addAttribute("allCategories", allCategories);
+		
+		if(titolo.equals("")) {
+			errors = true;
+			messaggio="inserisci il titolo";
+		}
 
-				List<Actor> allActors = new ArrayList<Actor>();
-				allActors = daoActor.allActors();
-				model.addAttribute("allActors", allActors);
-			}
-			if(!errors) {
-				try{
-					double prezzoInDouble= Double.parseDouble(prezzo);
-					filmDaInserire.setRental_rate(prezzoInDouble);
-				} catch (Exception e) {
-					errors = true;
-					model.addAttribute("messaggio", "il prezzo non è stato inserito correttamente");
-					List<Category> allCategories = new ArrayList<Category>();
-					allCategories = daoCategory.allCategories();
-					model.addAttribute("allCategories", allCategories);
+		try{
+			prezzoInDouble= Double.parseDouble(prezzo);
+		} catch (Exception e) {
+			errors = true;
+			messaggio="il prezzo non è stato inserito correttamente";
+		}
 
-					List<Actor> allActors = new ArrayList<Actor>();
-					allActors = daoActor.allActors();
-					model.addAttribute("allActors", allActors);
-				}
-			}
-
-			if(durata==null && !errors) {
-				errors = true;
-				model.addAttribute("messaggio", "inserisci la durata");
-				List<Category> allCategories = new ArrayList<Category>();
-				allCategories = daoCategory.allCategories();
-				model.addAttribute("allCategories", allCategories);
-
-				List<Actor> allActors = new ArrayList<Actor>();
-				allActors = daoActor.allActors();
-				model.addAttribute("allActors", allActors);
-			}
-			if(!errors) {
-				try {
-					filmDaInserire.setTitle(titolo);
-					filmDaInserire.setLength(durata);
-					filmDaInserire.setRelease_year(anno);
-					daoFilm.inserisciFilm(filmDaInserire, categoriaId, attori);
-				}  catch(Exception e) {
-					errors = true;
-					model.addAttribute("messaggio", "inserimento film non riuscito");
-					List<Category> allCategories = new ArrayList<Category>();
-					allCategories = daoCategory.allCategories();
-					model.addAttribute("allCategories", allCategories);
-
-					List<Actor> allActors = new ArrayList<Actor>();
-					allActors = daoActor.allActors();
-					model.addAttribute("allActors", allActors);
-				}
-			}
+		if(durata==null) {
+			errors = true;
+			messaggio="inserisci la durata";
 		}
 
 		if(!errors) {
-			model.addAttribute("messaggio", "inserimento film riuscito");
-			List<Category> allCategories = new ArrayList<Category>();
-			allCategories = daoCategory.allCategories();
-			model.addAttribute("allCategories", allCategories);
-
-			List<Actor> allActors = new ArrayList<Actor>();
-			allActors = daoActor.allActors();
-			model.addAttribute("allActors", allActors);
+			try {
+				Film filmDaInserire = new Film();
+				filmDaInserire.setTitle(titolo);
+				filmDaInserire.setLength(durata);
+				filmDaInserire.setRelease_year(anno);
+				filmDaInserire.setRental_rate(prezzoInDouble);
+				daoFilm.inserisciFilm(filmDaInserire, categoriaId, attori);
+			}  catch(Exception e) {
+				errors = true;
+				messaggio="inserimento film non riuscito";
+			}
 		}
+
+		List<Category> allCategories = new ArrayList<Category>();
+		allCategories = daoCategory.allCategories();
+		model.addAttribute("allCategories", allCategories);
+
+		List<Actor> allActors = new ArrayList<Actor>();
+		allActors = daoActor.allActors();
+		model.addAttribute("allActors", allActors);
+		model.addAttribute("messaggio", messaggio);
 		return "inserimentoFilm";
 
 	}
