@@ -33,13 +33,7 @@ public class FilmController {
 
 	@Autowired
 	IDaoActor daoActor;
-
-
-	@GetMapping("/inizio")
-	public String inizio(ModelMap model) {
-
-		return "forward:/stepRiempimentoForm";
-	}
+	
 
 	@GetMapping("/ricercaFilmPerCategoria")
 	public String filmPerCategoria (@RequestParam("categoriaFilm") Integer category_id, ModelMap model) {
@@ -51,32 +45,20 @@ public class FilmController {
 
 
 	@GetMapping("/ricercaFilmPerAttore")
-	public String filmPerAttore (@RequestParam("attoreId") int actor_id, ModelMap model) {
+	public String filmPerAttore (@RequestParam("attoreId") Integer actor_id, ModelMap model) {
 		List<Film> list = daoFilm.filmPerAttore(actor_id);
 		model.addAttribute("listaFilm", list);
 		return "forward:/stepRiempimentoForm";
 	}
 
 	@GetMapping("/filmPerAttore/{attoreId}")
-	public String filmPerAttorePathVariable (@PathVariable("attoreId") int actor_id, ModelMap model) {
+	public String filmPerAttorePathVariable (@PathVariable("attoreId") Integer actor_id, ModelMap model) {
 		List<Film> list = daoFilm.filmPerAttore(actor_id);
 		model.addAttribute("listaFilm", list);
 		return "forward:/stepRiempimentoForm";
 	}
 
-	@GetMapping("/stepRiempimentoForm")
-	public String riempimentoForm (ModelMap model) {
-		List<Category> allCategories = new ArrayList<Category>();
-		allCategories = daoCategory.allCategories();
-		model.addAttribute("allCategories", allCategories);
 
-		List<Actor> allActors = new ArrayList<Actor>();
-		allActors = daoActor.allActors();
-		model.addAttribute("allActors", allActors);
-		return "main";
-	}
-
-	
 	@GetMapping("/inserimentoFilm")
 	String inserimentoFilmForm(ModelMap model) {
 		List<Category> allCategories = new ArrayList<Category>();
@@ -93,21 +75,14 @@ public class FilmController {
 
 	@PostMapping("/inserisciFilm")
 	public String inserimentoFilm (@RequestParam("titolo") String titolo,
-			@RequestParam("prezzo") String prezzo, @RequestParam("durata") int durata, 
-			@RequestParam("anno") int anno, @RequestParam("idAttoriDaInserire") int[] attori,
-			@RequestParam("categoria") int categoriaId, ModelMap model) {
-	
-		try{
-			Film filmDaInserire = new Film();
-			filmDaInserire.setTitle(titolo);
-			double prezzoInDouble= Double.parseDouble(prezzo);
-			filmDaInserire.setRental_rate(prezzoInDouble);
-			filmDaInserire.setLength(durata);
-			filmDaInserire.setRelease_year(anno);
-			daoFilm.inserisciFilm(filmDaInserire, categoriaId, attori);
-			
-		} catch(Exception e) {
-			model.addAttribute("messaggio", "inserimento film non riuscito");
+			@RequestParam("prezzo") String prezzo, @RequestParam("durata") Integer durata, 
+			@RequestParam("anno") Integer anno, @RequestParam(value="idAttoriDaInserire", required=false) Integer[] attori,
+			@RequestParam("categoria") Integer categoriaId, ModelMap model) {
+		boolean errors=false;
+
+		if(attori==null) {
+			errors = true;
+			model.addAttribute("messaggio", "scegliere almeno un attore");
 			List<Category> allCategories = new ArrayList<Category>();
 			allCategories = daoCategory.allCategories();
 			model.addAttribute("allCategories", allCategories);
@@ -115,16 +90,78 @@ public class FilmController {
 			List<Actor> allActors = new ArrayList<Actor>();
 			allActors = daoActor.allActors();
 			model.addAttribute("allActors", allActors);
-			return "inserimentoFilm";
 		}
-		model.addAttribute("messaggio", "inserimento film riuscito");
-		List<Category> allCategories = new ArrayList<Category>();
-		allCategories = daoCategory.allCategories();
-		model.addAttribute("allCategories", allCategories);
+		if(!errors) {
+			Film filmDaInserire = new Film();
+			if(titolo=="") {
+				errors = true;
+				model.addAttribute("messaggio", "inserisci il titolo");
+				List<Category> allCategories = new ArrayList<Category>();
+				allCategories = daoCategory.allCategories();
+				model.addAttribute("allCategories", allCategories);
 
-		List<Actor> allActors = new ArrayList<Actor>();
-		allActors = daoActor.allActors();
-		model.addAttribute("allActors", allActors);
+				List<Actor> allActors = new ArrayList<Actor>();
+				allActors = daoActor.allActors();
+				model.addAttribute("allActors", allActors);
+			}
+			if(!errors) {
+				try{
+					double prezzoInDouble= Double.parseDouble(prezzo);
+					filmDaInserire.setRental_rate(prezzoInDouble);
+				} catch (Exception e) {
+					errors = true;
+					model.addAttribute("messaggio", "il prezzo non è stato inserito correttamente");
+					List<Category> allCategories = new ArrayList<Category>();
+					allCategories = daoCategory.allCategories();
+					model.addAttribute("allCategories", allCategories);
+
+					List<Actor> allActors = new ArrayList<Actor>();
+					allActors = daoActor.allActors();
+					model.addAttribute("allActors", allActors);
+				}
+			}
+
+			if(durata==null && !errors) {
+				errors = true;
+				model.addAttribute("messaggio", "inserisci la durata");
+				List<Category> allCategories = new ArrayList<Category>();
+				allCategories = daoCategory.allCategories();
+				model.addAttribute("allCategories", allCategories);
+
+				List<Actor> allActors = new ArrayList<Actor>();
+				allActors = daoActor.allActors();
+				model.addAttribute("allActors", allActors);
+			}
+			if(!errors) {
+				try {
+					filmDaInserire.setTitle(titolo);
+					filmDaInserire.setLength(durata);
+					filmDaInserire.setRelease_year(anno);
+					daoFilm.inserisciFilm(filmDaInserire, categoriaId, attori);
+				}  catch(Exception e) {
+					errors = true;
+					model.addAttribute("messaggio", "inserimento film non riuscito");
+					List<Category> allCategories = new ArrayList<Category>();
+					allCategories = daoCategory.allCategories();
+					model.addAttribute("allCategories", allCategories);
+
+					List<Actor> allActors = new ArrayList<Actor>();
+					allActors = daoActor.allActors();
+					model.addAttribute("allActors", allActors);
+				}
+			}
+		}
+
+		if(!errors) {
+			model.addAttribute("messaggio", "inserimento film riuscito");
+			List<Category> allCategories = new ArrayList<Category>();
+			allCategories = daoCategory.allCategories();
+			model.addAttribute("allCategories", allCategories);
+
+			List<Actor> allActors = new ArrayList<Actor>();
+			allActors = daoActor.allActors();
+			model.addAttribute("allActors", allActors);
+		}
 		return "inserimentoFilm";
 
 	}

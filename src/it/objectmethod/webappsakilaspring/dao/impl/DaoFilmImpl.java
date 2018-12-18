@@ -9,6 +9,8 @@ import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcDaoSupport;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 
 import it.objectmethod.webappsakilaspring.dao.IDaoFilm;
 import it.objectmethod.webappsakilaspring.model.Category;
@@ -53,20 +55,17 @@ public class DaoFilmImpl extends NamedParameterJdbcDaoSupport implements IDaoFil
 	}
 
 	@Override
-	public void inserisciFilm(Film film, int categoriaId, int[] idAttori) {
+	public void inserisciFilm(Film film, int categoriaId, Integer[] idAttori) {
 		String sql = "INSERT INTO film (title, rental_rate, length, release_year, language_id) values (:title, :prezzo, :durata, :release_year, :language_id)";
-//				+ "insert into film_category (film_id, category_id) values ((select max(film_id) from film), :categoria)";
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("title", film.getTitle());
 		params.addValue("prezzo", film.getRental_rate());
 		params.addValue("durata", film.getLength());
 		params.addValue("release_year", film.getRelease_year());
 		params.addValue("language_id", 1);
-//		params.addValue("categoria", categoriaId);
-		this.getNamedParameterJdbcTemplate().update(sql, params);
-		
-		sql= "select max(film_id) from film";
-		int filmId= this.getJdbcTemplate().queryForObject(sql, Integer.class);
+		KeyHolder keyHolder = new GeneratedKeyHolder();
+		this.getNamedParameterJdbcTemplate().update(sql, params, keyHolder);
+		int filmId= keyHolder.getKey().intValue();
 		
 		sql= "insert into film_category (film_id, category_id) values (:filmId, :categoria)";
 		params = new MapSqlParameterSource();
@@ -81,8 +80,6 @@ public class DaoFilmImpl extends NamedParameterJdbcDaoSupport implements IDaoFil
 			params.addValue("filmId", filmId);
 			this.getNamedParameterJdbcTemplate().update(sql, params);
 		}
-		
-		return;
 	}
 
 }

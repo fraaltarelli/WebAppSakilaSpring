@@ -29,7 +29,7 @@
 						maxlength="30"></td>
 					<td width="28%"><input type="text" name="prezzo">
 						&nbsp; $</td>
-					<td width="15%"><input type="number" name="durata" max="1000">
+					<td width="15%"><input type="number" name="durata" min="1" max="1000">
 					</td>
 					<td width="15%"><select name="categoria">
 							<c:forEach items="${allCategories}" var="categoria">
@@ -37,7 +37,7 @@
 									${categoria.name}</option>
 							</c:forEach></td>
 
-					<td width="14%"><input type="number" name="anno" max="3000"
+					<td width="14%"><input type="number" name="anno" min= "0" max="3000"
 						value="2000"></td>
 				</tr>
 			</table>

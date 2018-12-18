@@ -29,7 +29,7 @@ public class ActorController {
 	
 	
 	@GetMapping("/attoriPerFilm/{filmId}")
-	public String attoriPerFilm(@PathVariable("filmId") int filmId, ModelMap model) {
+	public String attoriPerFilm(@PathVariable("filmId") Integer filmId, ModelMap model) {
 		List<Actor> list = new ArrayList<Actor>();
 		list = daoActor.attoriPerFilm(filmId);
 		model.addAttribute("listaAttori", list);
