@@ -13,16 +13,16 @@ import it.objectmethod.webappsakilaspring.model.Actor;
 public class DaoActorImpl extends NamedParameterJdbcDaoSupport implements IDaoActor{
 
 	@Override
-	public List<Actor> allactors() {
+	public List<Actor> allActors() {
 		List<Actor> list = new ArrayList<Actor>();
 		String sql = "select * from actor";
 		BeanPropertyRowMapper<Actor> rm = new BeanPropertyRowMapper<Actor>(Actor.class);
-		list = this.getNamedParameterJdbcTemplate().query(sql, rm);
+		list = this.getJdbcTemplate().query(sql, rm);
 		return list;
 	}
 
 	@Override
-	public List<Actor> attoriperfilm(int filmId) {
+	public List<Actor> attoriPerFilm(int filmId) {
 		List<Actor> list = new ArrayList<Actor>();
 		String sql = "select actor.actor_id, actor.first_name, actor.last_name from actor "+
 		        "inner join film_actor on actor.actor_id= film_actor.actor_id  inner join film "+
@@ -30,6 +30,17 @@ public class DaoActorImpl extends NamedParameterJdbcDaoSupport implements IDaoAc
 		BeanPropertyRowMapper<Actor> rm = new BeanPropertyRowMapper<Actor>(Actor.class);
 		MapSqlParameterSource params = new MapSqlParameterSource();
 		params.addValue("filmId", filmId);
+		list = this.getNamedParameterJdbcTemplate().query(sql, params, rm);
+		return list;
+	}
+
+	@Override
+	public List<Actor> ricercaAttore(String attoreCercato) {
+		List<Actor> list = new ArrayList<Actor>();
+		String sql = "select * from actor where first_name like :likeAttoreCercato or last_name like :likeAttoreCercato";
+		BeanPropertyRowMapper <Actor> rm = new BeanPropertyRowMapper<Actor>(Actor.class);
+		MapSqlParameterSource params = new MapSqlParameterSource();
+		params.addValue("likeAttoreCercato", "%"+attoreCercato+"%");
 		list = this.getNamedParameterJdbcTemplate().query(sql, params, rm);
 		return list;
 	}

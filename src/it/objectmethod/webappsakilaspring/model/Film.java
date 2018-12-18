@@ -7,8 +7,15 @@ public class Film {
 	private String title;
 	private double rental_rate;
 	private int length;
+	private int release_year;
 	
 	
+	public int getRelease_year() {
+		return release_year;
+	}
+	public void setRelease_year(int release_year) {
+		this.release_year = release_year;
+	}
 	public int getFilm_id() {
 		return film_id;
 	}

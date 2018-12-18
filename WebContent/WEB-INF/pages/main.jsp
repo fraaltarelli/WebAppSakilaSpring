@@ -10,70 +10,79 @@
 <body>
 	<div style="text-align: center;">
 
-		<c:if test="${allcategories != null}">
-			<form action="filmpercategoria">
+		<c:if test="${allCategories != null}">
+			<form action="/WebAppSakilaSpring/ricercaFilmPerCategoria">
 				<strong>Ricerca film per categoria</strong> <br> <select
-					name="categoriafilm">
+					name="categoriaFilm">
 
-					<c:forEach items="${allcategories}" var="categoria">
+					<c:forEach items="${allCategories}" var="categoria">
 						<option value="${categoria.category_id}">
 							${categoria.name}</option>
 					</c:forEach>
-				</select> <input type="submit" name="cercafilmpercategoria" value="Cerca">
+				</select> <input type="submit" name="cercaFilmPerCategoria" value="Cerca">
 			</form>
 		</c:if>
 		<br>
 
 
-		<c:if test="${allactors != null}">
-			<form action="filmperattore">
+		<c:if test="${allActors != null}">
+			<form action="/WebAppSakilaSpring/ricercaFilmPerAttore">
 				<strong>Ricerca film per attore</strong> <br> <select
-					name="attorefilm">
-					<c:forEach items="${allactors}" var="attore">
+					name="attoreId">
+					<c:forEach items="${allActors}" var="attore">
 						<option value="${attore.actor_id}">${attore.first_name}
 							&nbsp ${attore.last_name}</option>
 					</c:forEach>
-				</select> <input type="submit" name="cercafilmperattore" value="Cerca">
+				</select> <input type="submit" name="cercaFilmPerAttore" value="Cerca">
 			</form>
 		</c:if>
 
-		<c:if test="${listafilm != null }">
-			<a href="inizio">
-				<button>Torna alla Home</button>
-			</a>
-			<br>
-			<br>
+		<br>
+		<form action="/WebAppSakilaSpring/ricercaAttore">
+			<input type="text" name="ricercaAttore"> <input type="submit"
+				name="cercaAttore" value="Cerca Attore">
+		</form>
+		<br>
+
+		<form action="/WebAppSakilaSpring/inserimentoFilm">
+			<input type="submit" name="inserimentoFilm"
+				value="Inserisci un nuovo film">
+		</form>
+		<br>
+
+
+		<c:if test="${listaFilm != null }">
+
 			<table width="75%" border="1" align="center">
 				<tr>
-					<th width="50%">Titolo</th>
-					<th width="25%">Costo</th>
-					<th width="25%">Durata</th>
+					<th width="40%">Titolo</th>
+					<th width="24%">Costo</th>
+					<th width="24%">Durata</th>
+					<th width="12%">Anno</th>
 				</tr>
-				<c:forEach items="${listafilm}" var="film">
+				<c:forEach items="${listaFilm}" var="film">
 					<tr>
-						<td width="50%"><a
-							href="attoriperfilm?filmId=${film.film_id}"> ${film.title} </a></td>
-						<td width="25%">${film.rental_rate}&nbsp;$</td>
-						<td width="25%">${film.length}&nbsp;min</td>
+						<td width="40%"><a
+							href="/WebAppSakilaSpring/attoriPerFilm/${film.film_id}">
+								${film.title} </a></td>
+						<td width="24%">${film.rental_rate}&nbsp;$</td>
+						<td width="24%">${film.length}&nbsp;min</td>
+						<td width="12%">${film.release_year}</td>
 					</tr>
 				</c:forEach>
 			</table>
 		</c:if>
 
-		<c:if test="${listaattori != null }">
-			<a href="inizio">
-				<button>Torna alla Home</button>
-			</a>
-			<br>
-			<br>
+		<c:if test="${listaAttori != null }">
 			<table width="50%" border="1" align="center">
 				<tr>
 					<th width="50%">Attori</th>
 				</tr>
-				<c:forEach items="${listaattori}" var="attore">
+				<c:forEach items="${listaAttori}" var="attore">
 					<tr>
+
 						<td width="50%"><a
-							href="filmperattore?attorefilm=${attore.actor_id}">
+							href="/WebAppSakilaSpring/filmPerAttore/${attore.actor_id}">
 								${attore.first_name} &nbsp; ${attore.last_name} </a></td>
 					</tr>
 				</c:forEach>

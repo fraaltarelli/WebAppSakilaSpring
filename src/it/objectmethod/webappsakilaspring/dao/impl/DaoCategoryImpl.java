@@ -13,11 +13,11 @@ import it.objectmethod.webappsakilaspring.model.Category;
 public class DaoCategoryImpl extends NamedParameterJdbcDaoSupport implements IDaoCategory{
 
 	@Override
-	public List<Category> allcategories() {
+	public List<Category> allCategories() {
 		List<Category> list = new ArrayList<Category>();
 		String sql = "select * from category";
 		BeanPropertyRowMapper<Category> rm = new BeanPropertyRowMapper<Category>(Category.class);
-		list = this.getNamedParameterJdbcTemplate().query(sql, rm);
+		list = this.getJdbcTemplate().query(sql, rm);
 		return list;
 	}
 
